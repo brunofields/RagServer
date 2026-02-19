@@ -14,7 +14,7 @@ SkillBowlingBash::SkillBowlingBash() : SkillImpl(KN_BOWLINGBASH) {
 }
 
 void SkillBowlingBash::calculateSkillRatio(const Damage* wd, const block_list* src, const block_list* target, uint16 skill_lv, int32& base_skillratio, int32 mflag) const {
-	base_skillratio += 40 * skill_lv;
+	base_skillratio += 60 * skill_lv;
 }
 
 void SkillBowlingBash::castendDamageId(block_list* src, block_list* target, uint16 skill_lv, t_tick tick, int32& flag) const {

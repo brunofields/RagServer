@@ -3024,7 +3024,7 @@ static bool is_attack_critical(struct Damage* wd, block_list *src, const block_l
 				return false;
 
 			if(pc_checkskill(sd,TF_DOUBLE) && !skill_get_nk(TF_DOUBLE,NK_CRITICAL)) //Double Attack
-				return false;
+				return true;
 		}
 
 		const status_data* tstatus = status_get_status_data(*target);
@@ -7680,9 +7680,11 @@ struct Damage battle_calc_misc_attack(block_list *src,block_list *target,uint16 
 #ifdef RENEWAL
 				md.damage = skill_lv * 20 + skill * 6 + ((sstatus->agi / 2) *2) + ((sstatus->dex / 10) *2);
 #else
-				md.damage = (sstatus->dex / 10 + sstatus->int_ / 2 + skill * 3 + 40) * 2;
-				if(mflag > 1) //Autocasted Blitz
-					nk.set(NK_SPLASHSPLIT);
+				// Alterando Formula Blitz Beat
+				// md.damage = (sstatus->dex / 10 + sstatus->int_ / 2 + skill * 3 + 40) * 2;
+				// if(mflag > 1) //Autocasted Blitz
+				// 	nk.set(NK_SPLASHSPLIT);
+				md.damage = skill_lv * 20 + skill * 6 + ((sstatus->agi / 2) *2) + ((sstatus->dex / 10) *2);
 #endif
 				if (skill_id == SN_FALCONASSAULT) {
 					//Div fix of Blitzbeat
@@ -7709,7 +7711,7 @@ struct Damage battle_calc_misc_attack(block_list *src,block_list *target,uint16 
 			break;
 #ifndef RENEWAL
 		case ASC_BREAKER:
-			md.damage = 500 + rnd()%500 + 5 * skill_lv * sstatus->int_;
+			md.damage = 500 + rnd()%500 + 5 * skill_lv * sstatus->batk;
 			nk.set(NK_IGNOREFLEE);
 			nk.set(NK_IGNOREELEMENT); //These two are not properties of the weapon based part.
 			break;

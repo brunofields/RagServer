@@ -32,7 +32,7 @@ void SkillMagnumBreak::modifyHitRate(int16 &hit_rate, const block_list *src, con
 void SkillMagnumBreak::castendDamageId(block_list *src, block_list *target, uint16 skill_lv, t_tick tick, int32& flag) const
 {
 	map_session_data* sd = BL_CAST( BL_PC, src );
-
+	
 	if (flag & 1)
 	{
 		// For players, damage depends on distance, so add it to flag if it is > 1
@@ -51,8 +51,8 @@ void SkillMagnumBreak::castendNoDamageId(block_list *src, block_list *bl, uint16
 	clif_skill_nodamage(src, *src, skillId, skill_lv);
 	// Initiate 20% of your damage becomes fire element.
 #ifdef RENEWAL
-	sc_start4(src, src, SC_SUB_WEAPONPROPERTY, 100, ELE_FIRE, 20, skillId, 0, skill_get_time2(skillId, skill_lv));
+	sc_start4(src, src, SC_SUB_WEAPONPROPERTY, 100, ELE_FIRE, 100, skillId, 0, 30000);
 #else
-	sc_start4(src, src, SC_WATK_ELEMENT, 100, ELE_FIRE, 20, 0, 0, skill_get_time2(skillId, skill_lv));
+	sc_start4(src, src, SC_WATK_ELEMENT, 100, ELE_FIRE, 20, 0, 0, 60000);
 #endif
 }
