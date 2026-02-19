@@ -1,0 +1,131 @@
+//===== rAthena Script =======================================
+//= Stylist NPC
+//===== By: ==================================================
+//= wrywndp (https://www.youtube.com/@wrywndp)
+//= Based on Euphy's & AnnieRuru's version
+//===== Description: =========================================
+//= Stylist NPC script (Pre-Renewal).
+//===== Additional Comments: =================================
+//= This script is made for Ragnarok Offline Pre-Renewal Pack
+//= https://www.youtube.com/watch?v=aN5OCJdj2qA
+//============================================================
+
+aegis,104,90,4	script	Stylist	122,{
+
+	mes .NpcName$;
+	mes .FeeMsg$;
+	mes .SelectMsg$;
+	next;
+
+	setarray .@Styles[1],
+		getbattleflag("max_hair_style"),
+		getbattleflag("max_hair_color"),
+		getbattleflag("max_cloth_color");
+
+	setarray .@Look[1],
+		LOOK_HAIR,
+		LOOK_HAIR_COLOR,
+		LOOK_CLOTHES_COLOR;
+
+	.@s = select("Hair Style:Hair Color:Cloth Color:^FF3355Reset Looks^000000");
+
+	if (.@s == 4) {
+		mes .NpcName$;
+		mes "Are you sure you want to reset your looks?";
+		next;
+		switch(select("Yes:No")) {
+			case 1:
+				for (.@i = 1; .@i <= 3; .@i++) {
+					setlook .@Look[.@i], 1;
+				}
+				specialeffect2 EF_STEAL;
+				mes .NpcName$;
+				mes "Done! I've reset your look.";
+				close;
+			case 2:
+				mes .NpcName$;
+				mes "Okay then.";
+				close;
+		}
+		close;
+	}
+
+	.@Style = .@Revert = (getlook(.@Look[.@s]) > 0) ? getlook(.@Look[.@s]) : 1;
+
+	while (1) {
+		changelook .@Look[.@s], .@Style;
+		message strcharinfo(0), "This is style #" + .@Style + ".";
+		
+		.@next		= ((.@Style != .@Styles[.@s]) ? .@Style + 1 : 1);
+		.@previous	= ((.@Style != 1) ? .@Style - 1 : .@Styles[.@s]);
+		
+		.@n_menu$	= "Next [^FF3355" + ((.@Style != .@Styles[.@s]) ? .@Style + 1 : 1)+"^000000]";
+		.@p_menu$	= "Previous [^FF3355" + ((.@Style != 1) ? .@Style - 1 : .@Styles[.@s]) + "^000000]";
+
+		switch(prompt(
+			(.@order) ? .@p_menu$ : .@n_menu$,
+			(.@order) ? .@n_menu$ : .@p_menu$,
+			"^00A000Jump to ...^000000",
+			"^FF3355Revert to original^000000 [^FF3355" + .@Revert + "^000000]",
+			"^1A66FFUse this style^000000")) {
+			case 1:
+				.@Style = (.@order) ? .@previous : .@next;
+				break;
+			case 2:
+				.@Style = (.@order) ? .@next : .@previous;
+				.@order = !.@order;
+				break;
+			case 3:
+				clear;
+				mes .NpcName$;
+				mes "Choose a style between ^FF33551^000000 - ^FF3355" + .@Styles[.@s] + "^000000.";
+				mes "^FF33550^000000 = Random";
+				next;
+
+				input .@Style, 0, .@Styles[.@s];
+				if (!.@Style) .@Style = rand(1, .@Styles[.@s]);
+
+				clear;
+				mes .NpcName$;
+				mes .FeeMsg$;
+				mes .SelectMsg$;
+				break;
+			case 4:
+				.@Style = .@Revert;
+				setlook .@Look[.@s], .@Revert;
+				break;
+			case 5:
+				clear;
+				mes .NpcName$;
+				if (Zeny < .StylistFee) {
+					mes "I'm sorry, you don't have enough Zeny.";
+					changelook .@Look[.@s], .@Revert;
+					close;
+				}
+
+				if (.@Style != .@Revert) {
+					Zeny -= .StylistFee;
+					setlook .@Look[.@s], .@Style;
+					specialeffect2 EF_STEAL;
+					mes "Good choice.";
+				} else {
+					mes "No changes made?";
+					mes "Come back and see me if you change your mind.";
+				}
+
+				close;
+			case 255:
+				.@Style = .@Revert;
+				changelook .@Look[.@s], .@Revert;
+				end;
+		}
+	}
+
+OnInit:
+	.StylistFee = 100000;
+
+	.NpcName$ = "[Stylist]";
+	.FeeMsg$ = "You can browse the selection for free, but you must select ^1A66FFUse this style^000000 to finalize your choice for ^FF3355" + callfunc("F_InsertComma", .StylistFee) + "^000000 ^777777z^000000.";
+	.SelectMsg$ = "Do you want to change your style?";
+	end;
+}

@@ -1,0 +1,32 @@
+//===== rAthena Script ======================================= 
+//= Freebies NPC
+//===== By: ==================================================
+//= wrywndp (https://www.youtube.com/@wrywndp)
+//===== Description: ========================================= 
+//= Freebies NPC script (Pre-Renewal).
+//===== Additional Comments: =================================
+//= This script is made for Ragnarok Offline Pre-Renewal Pack
+//= https://www.youtube.com/watch?v=aN5OCJdj2qA
+//============================================================
+
+aegis,112,73,4	script	Freebies	49,{
+
+	.@FreeCoin = 1000;	// Amount Coin
+
+	if (!#Freebies)  {
+		mes "[Freebies]";
+		mes "Welcome, this is your free coin";
+		set #CASHPOINTS, #CASHPOINTS + .@FreeCoin;
+		set #Freebies,1;
+		dispbottom "You've got " + callfunc("F_InsertComma", .@FreeCoin) + " Cash Points. Total: " + callfunc("F_InsertComma", #CASHPOINTS) + " Cash Points.";
+		close;
+	} else {
+		mes "[Freebies]";
+		mes "You have claim the free coin already.";
+		close;
+	}
+
+OnInit:
+	waitingroom "Freebies Here",0;
+	end;
+}

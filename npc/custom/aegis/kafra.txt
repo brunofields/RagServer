@@ -1,0 +1,360 @@
+//===== rAthena Script =======================================
+//= Custom Kafras
+//===== By: ==================================================
+//= wrywndp (https://www.youtube.com/@wrywndp)
+//===== Description: =========================================
+//= Custom Kafras NPC script (Pre-Renewal).
+//= 1. Save respawn point
+//= 2. Open storage
+//= 3. Open Guild Warehouse
+//= 4. Rental service
+//===== Additional Comments: =================================
+//= This script is made for Ragnarok Offline Pre-Renewal Pack
+//= https://www.youtube.com/watch?v=aN5OCJdj2qA
+//============================================================
+
+function	script	F_Custom_Kafra	{
+
+	.npc_name$ = "[Kafra Employee]";
+	.StoragePrice = 40;			// Personal storage fee in Zeny
+	.WarehousePrice = 1000;		// Guild Warehouse fee in Zeny
+
+	cutin "kh_ellisia",2;
+	mes .npc_name$;
+	mes "Welcome to the Kafra Corporation.";
+	mes "The Kafra Services are always here to support you.";
+	mes "So how can I be of service today?";
+	next;
+
+	.@MainMenu$ = "^1A66FFSave^000000:Open Storage ^777777[" + callfunc("F_InsertComma", .StoragePrice) + " z]^000000";
+	.@MainMenu$ += ":Open Guild Warehouse ^777777[" + callfunc("F_InsertComma", .WarehousePrice) + " z]^000000";
+	.@MainMenu$ += ":Rental Service:^777777Cancel^000000";
+
+	switch(select(.@MainMenu$)) {
+		case 1:
+			mes .npc_name$;
+			if (getarg(2)) {
+				savepoint getarg(1), getarg(2), getarg(3);
+				mes "Your Respawn Point has been saved here in the " + getarg(0) + ".";
+				mes "Thank you.";
+			} else {
+				mes "I'm sorry but you can't set your respawn point in here.";
+			}
+			break;
+		case 2:
+			callfunc "F_KafStor", 0, .StoragePrice, 0;
+			break;
+		case 3:
+			if (Zeny < .WarehousePrice) {
+				mes .npc_name$;
+				mes "I am afraid you do not have enough money to settle the fee.";
+				mes "The fee is " + callfunc("F_InsertComma", .WarehousePrice) + " z.";
+				close3;
+			}
+
+			if (Zeny < .WarehousePrice) {
+				// Cheat prevention
+				end;
+			}
+
+			mes .npc_name$;
+			mes "I will open the guild storage for you then. Have a memorable time!";
+			close2;
+			cutin "", 255;
+
+			switch(guildopenstorage()) {
+				case GSTORAGE_STORAGE_ALREADY_OPEN:
+					mes .npc_name$;
+					mes "You are using your storage.";
+					mes "Please wait a while, then come back.";
+					close3;
+				case GSTORAGE_ALREADY_OPEN:
+					mes .npc_name$;
+					mes "The Guild Warehouse is being used right now.";
+					mes "Please wait a while, then come back.";
+					close3;
+				case GSTORAGE_NO_GUILD:
+					mes .npc_name$;
+					mes "You can't use this service if you're not in a guild!";
+					close3;
+				case GSTORAGE_NO_STORAGE:
+					mes .npc_name$;
+					mes "The guild does not have a guild storage.";
+					close3;
+				case GSTORAGE_NO_PERMISSION:
+					mes .npc_name$;
+					mes "You don't have permission to use the guild storage!";
+					close3;
+				default:
+					Zeny -= .WarehousePrice;
+					end;
+			}
+			break;
+		case 4:
+			if (ismounting()) {
+				message strcharinfo(0), "I must remove my mount first.";
+				end;
+			}
+
+			// Cart Rental
+			if (!checkcart() && getskilllv("MC_PUSHCART")) {
+				.@cart_cost = 1000;
+				mes "[Rental Service]";
+				mes "Rent a cart for ^FF3355" + callfunc("F_InsertComma", .@cart_cost) + "^000000 z?";
+				next;
+				switch(select("Yes:No")) {
+					case 1:
+						mes "[Rental Service]";
+						if (Zeny < .@cart_cost) {
+							mes "You need ^FF3355" + callfunc("F_InsertComma", .@cart_cost) + "^000000 z to rent a cart.";
+							close3;
+						}
+						Zeny -= .@cart_cost;
+						setcart;
+						specialeffect2 EF_CARTREVOLUTION;
+						mes "Cart has been rented!";
+						close3;
+					case 2:
+						mes "[Rental Service]";
+						mes "Okay then.";
+						close3;
+
+				}
+				close3;
+			}
+
+			// Falcon Rental
+			if (!checkfalcon() && getskilllv("HT_FALCON")) {
+				.@falcon_cost = 2500;
+				mes "[Rental Service]";
+				mes "Rent a falcon for ^FF3355" + callfunc("F_InsertComma", .@falcon_cost) + "^000000 z?";
+				next;
+				switch(select("Yes:No")) {
+					case 1:
+						mes "[Rental Service]";
+						if (Zeny < .@falcon_cost) {
+							mes "You need ^FF3355" + callfunc("F_InsertComma", .@falcon_cost) + "^000000 z to rent a falcon.";
+							close3;
+						}
+						Zeny -= .@falcon_cost;
+						setfalcon;
+						specialeffect2 EF_DETECTING;
+						mes "Falcon has been rented!";
+						close3;
+					case 2:
+						mes "[Rental Service]";
+						mes "Okay then.";
+						close3;
+
+				}
+				close3;
+			}
+
+			// Peco Peco Rental
+			if (!checkriding() && getskilllv("KN_RIDING")) {
+				if (BaseJob == Job_Knight) {
+					.@peco_cost = 2500;
+				} else if (BaseJob == Job_Crusader) {
+					.@peco_cost = 3500;
+				} else {
+					mes "[Rental Service]";
+					mes "Only Knights and Crusader can rent a Peco Peco.";
+					close3;
+				}
+				
+				mes "[Rental Service]";
+				mes "Rent a Peco Peco for ^FF3355" + callfunc("F_InsertComma", .@peco_cost) + "^000000 z?";
+				next;
+				switch(select("Yes:No")) {
+					case 1:
+						mes "[Rental Service]";
+						if (Zeny < .@peco_cost) {
+							mes "You need ^FF3355" + callfunc("F_InsertComma", .@peco_cost) + "^000000 z to rent a mount.";
+							close3;
+						}
+						Zeny -= .@peco_cost;
+						setriding;
+						specialeffect2 EF_MAGNUMBREAK;
+						mes "Peco peco has been rented!";
+						close3;
+					case 2:
+						mes "[Rental Service]";
+						mes "Okay then.";
+						close3;
+
+				}
+				close3;
+			}
+
+			mes .npc_name$;
+			mes "You do not meet requirements to rent.";
+			break;
+		case 5:
+			mes .npc_name$;
+			mes "^666666*Whew...*^000000";
+			mes "Great, because I'm actually on my break.";
+			break;
+	}
+	close3;
+}
+
+
+
+//============================================================
+// Duplicates
+//============================================================
+aegis,76,78,6	script	Kafra Employee::custom_kafra_aegis	894,{
+	callfunc "F_Custom_Kafra", "Town of Aegis", "aegis", 84, 75;
+	end;
+}
+
+aegis_trade,29,35,4	script	Kafra Employee::custom_kafra_trade	894,{
+	callfunc "F_Custom_Kafra", "-", "-", 0, 0;
+	end;
+}
+
+aegis_store,10,18,6	script	Kafra Employee::custom_kafra_store	894,{
+	callfunc "F_Custom_Kafra", "-", "-", 0, 0;
+	end;
+}
+
+aegis_works,20,32,4	script	Kafra Employee::custom_kafra_works	894,{
+	callfunc "F_Custom_Kafra", "-", "-", 0, 0;
+	end;
+}
+
+
+// prontera,155,196,6	script	Kafra Employee::custom_kafra_prontera	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Prontera", "prontera", 156, 188;
+// 	end;
+// }
+
+// alberta,176,140,6	script	Kafra Employee::custom_kafra_alberta	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Alberta", "alberta", 179, 136;
+// 	end;
+// }
+
+// aldebaran,132,121,6	script	Kafra Employee::custom_kafra_aldebaran	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Al De Baran", "aldebaran", 135, 117;
+// 	end;
+// }
+
+// amatsu,194,138,6	script	Kafra Employee::custom_kafra_amatsu	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Amatsu", "amatsu", 197, 134;
+// 	end;
+// }
+
+// ayothaya,205,201,6	script	Kafra Employee::custom_kafra_ayothaya	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Ayothaya", "ayothaya", 208, 197;
+// 	end;
+// }
+
+// brasilis,193,185,6	script	Kafra Employee::custom_kafra_brasilis	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Brasilis", "brasilis", 196, 181;
+// 	end;
+// }
+
+// comodo,201,138,6	script	Kafra Employee::custom_kafra_comodo	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Comodo", "comodo", 204, 134;
+// 	end;
+// }
+
+// einbech,164,135,6	script	Kafra Employee::custom_kafra_einbech	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Einbech", "einbech", 167, 131;
+// 	end;
+// }
+
+// einbroch,169,316,6	script	Kafra Employee::custom_kafra_einbroch	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Einbroch", "einbroch", 172, 312;
+// 	end;
+// }
+
+// geffen,116,102,6	script	Kafra Employee::custom_kafra_geffen	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Geffen", "geffen", 119, 95;
+// 	end;
+// }
+
+// gonryun,157,177,6	script	Kafra Employee::custom_kafra_gonryun	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Gonryun", "gonryun", 160, 173;
+// 	end;
+// }
+
+// hugel,92,155,6	script	Kafra Employee::custom_kafra_hugel	894,{
+// 	callfunc "F_Custom_Kafra", "Village of Hugel", "hugel", 95, 151;
+// 	end;
+// }
+
+// izlude,125,114,6	script	Kafra Employee::custom_kafra_izlude	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Izlude", "izlude", 128, 110;
+// 	end;
+// }
+
+// jawaii,213,163,6	script	Kafra Employee::custom_kafra_jawaii	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Jawaii", "jawaii", 216, 159;
+// 	end;
+// }
+
+// lighthalzen,156,94,6	script	Kafra Employee::custom_kafra_lighthalzen	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Lighthalzen", "lighthalzen", 159, 90;
+// 	end;
+// }
+
+// louyang,215,98,6	script	Kafra Employee::custom_kafra_louyang	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Louyang", "louyang", 218, 94;
+// 	end;
+// }
+
+// xmas,145,121,6	script	Kafra Employee::custom_kafra_xmas	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Lutie", "xmas", 148, 117;
+// 	end;
+// }
+
+// manuk,272,144,6	script	Kafra Employee::custom_kafra_manuk	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Manuk", "manuk", 275, 140;
+// 	end;
+// }
+
+// mid_camp,210,229,6	script	Kafra Employee::custom_kafra_mid_camp	894,{
+// 	callfunc "F_Custom_Kafra", "Midgarts Expedition Camp", "mid_camp", 213, 225;
+// 	end;
+// }
+
+// morocc,160,97,6	script	Kafra Employee::custom_kafra_morocc	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Morroc", "morocc", 163, 93;
+// 	end;
+// }
+
+// moscovia,233,198,6	script	Kafra Employee::custom_kafra_moscovia	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Moscovia", "moscovia", 236, 194;
+// 	end;
+// }
+
+// payon,162,96,6	script	Kafra Employee::custom_kafra_payon	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Payon", "payon", 165, 92;
+// 	end;
+// }
+
+// rachel,125,143,6	script	Kafra Employee::custom_kafra_rachel	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Rachel", "rachel", 128, 139;
+// 	end;
+// }
+
+// splendide,200,153,6	script	Kafra Employee::custom_kafra_splendide	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Splendide", "splendide", 203, 149;
+// 	end;
+// }
+
+// umbala,86,155,6	script	Kafra Employee::custom_kafra_umbala	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Umbala", "umbala", 89, 151;
+// 	end;
+// }
+
+// veins,214,132,6	script	Kafra Employee::custom_kafra_veins	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Veins", "veins", 217, 128;
+// 	end;
+// }
+
+// yuno,154,180,6	script	Kafra Employee::custom_kafra_yuno	894,{
+// 	callfunc "F_Custom_Kafra", "Town of Yuno", "yuno", 157, 176;
+// 	end;
+// }

@@ -1,0 +1,159 @@
+//===== rAthena Script =======================================
+//= Plagiarism NPC
+//===== By: ==================================================
+//= wrywndp (https://www.youtube.com/@wrywndp)
+//===== Description: =========================================
+//= Plagiarism NPC script for Rogue class (Pre-Renewal).
+//===== Additional Comments: =================================
+//= This script is made for Ragnarok Offline Pre-Renewal Pack
+//= https://www.youtube.com/watch?v=aN5OCJdj2qA
+//============================================================
+
+aegis_guild,12,19,6	script	Master Rogue	810,{
+
+L_MainMenu:
+	mes .NpcName$;
+	if (!getskilllv(225)) {
+		mes "You must have Plagiarism skill.";
+		close;
+	}
+	mes .FeeMsg$;
+	mes .SelectMsg$;
+	next;
+
+	.s = select("- Swordman:- Mage:- Archer:- Merchant:- Thief:- Acolyte:- Expanded:- Other:^FF3355Remove Plagiarized Skill [FREE]^000000:^777777Close^000000");
+
+	if (.s == 9) goto L_RemoveSkill;
+	if (.s == 10) {
+		mes .NpcName$;
+		mes "No? Very well. Don't waste my time.";
+		close;
+	}
+
+L_SubMenu:
+	mes .NpcName$;
+	mes .FeeMsg$;
+	mes .SelectMsg$;
+	next;
+	if (.s == 1) { // Swordman
+		.sub = select("- Swordman:- Knight:- Crusader:^777777Back^000000");
+		if (.sub == 4) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Bash:Magnum Break:^777777Back^000000", 5, 7;
+		if (.sub == 2) callsub L_Plagiarism, "Bowling Bash:^777777Back^000000", 62;
+		if (.sub == 3) callsub L_Plagiarism, "Shield Charge:Shield Boomerang:Holy Cross:Grand Cross:^777777Back^000000", 250, 251, 253, 254;
+	} 
+	else if (.s == 2) { // Mage
+		.sub = select("- Mage:- Wizard:^777777Back^000000");
+		if (.sub == 3) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Napalm Beat:Soul Strike:Cold Bolt:Frost Diver:Fire Ball:Fire Wall:Fire Bolt:Lightning Bolt:Thunder Storm:^777777Back^000000", 11, 13, 14, 15, 17, 18, 19, 20, 21;
+		if (.sub == 2) callsub L_Plagiarism, "Fire Pillar:Sightrasher:Meteor Storm:Jupitel Thunder:Lord of Vermillion:Water Ball:Frost Nova:Storm Gust:Earth Spike:Heaven's Drive:^777777Back^000000", 80, 81, 83, 84, 85, 86, 88, 89, 90, 91;
+	} 
+	else if (.s == 3) { // Archer
+		.sub = select("- Archer:- Hunter:^777777Back^000000");
+		if (.sub == 3) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Double Strafing:Arrow Shower:Charge Arrow:^777777Back^000000", 46, 47, 148;
+		if (.sub == 2) callsub L_Plagiarism, "Land Mine:Blast Mine:Claymore Trap:^777777Back^000000", 116, 122, 123;
+	} 
+	else if (.s == 4) { // Merchant
+		.sub = select("- Merchant:- Alchemist:^777777Back^000000");
+		if (.sub == 3) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Mammonite:^777777Back^000000", 42;
+		if (.sub == 2) callsub L_Plagiarism, "Demonstration:Acid Terror:^777777Back^000000", 229, 230;
+	} 
+	else if (.s == 5) { // Thief
+		.sub = select("- Assassin:^777777Back^000000");
+		if (.sub == 2) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Venom Splasher:Throw Venom Knife:^777777Back^000000", 141, 1004;
+	} 
+	else if (.s == 6) { // Acolyte
+		.sub = select("- Acolyte:- Priest:- Monk:^777777Back^000000");
+		if (.sub == 4) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Ruwach:Heal:Holy Light:^777777Back^000000", 24, 28, 156;
+		if (.sub == 2) callsub L_Plagiarism, "Resurrection:Aspersio:B.S Sacramenti:Sanctuary:Turn Undead:Magnus Exorcismus:^777777Back^000000", 54, 68, 69, 70, 77, 79;
+		if (.sub == 3) callsub L_Plagiarism, "Triple Attack:Investigate:Finger Offensive:Asura Strike:^777777Back^000000", 263, 266, 267, 271;
+	} 
+	else if (.s == 7) { // Expanded
+		.sub = select("- Ninja:- TaeKwon:^777777Back^000000");
+		if (.sub == 3) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Flip Tatami:Haze Slasher:Shadow Slash:Flaming Petals:Blaze Shield:Exploding Dragon:Freezing Spear:Snow Flake Draft:Wind Blade:Lightning Jolt:First Wind:^777777Back^000000", 527, 528, 530, 534, 535, 536, 537, 539, 540, 541, 542;
+		if (.sub == 2) callsub L_Plagiarism, "Flying Kick:^777777Back^000000", 421;
+	} 
+	else if (.s == 8) { // Other
+		.sub = select("- Special Skill:^777777Back^000000");
+		if (.sub == 2) goto L_MainMenu;
+		if (.sub == 1) callsub L_Plagiarism, "Throw Tomahawk:^777777Back^000000", 337;
+	}
+	goto L_SubMenu;
+
+L_Plagiarism:
+	.names$ = getarg(0);
+
+	while(1) {
+		mes .NpcName$;
+		mes .FeeMsg$;
+		mes .SelectMsg$;
+		next;
+		.choice = select(.names$);
+		
+		deletearray .split_names$[0], getarraysize(.split_names$);
+		explode(.split_names$, .names$, ":");
+		.total_options = getarraysize(.split_names$);
+
+		if (.choice == .total_options) {
+			return; 
+		}
+
+		.skillID = getarg(.choice);
+		.sName$ = .split_names$[.choice - 1];
+
+		mes .NpcName$;
+		mes .FeeMsg$;
+		mes "Are you sure want to learn ^0000FF" + .sName$ + "^000000?";
+		next;
+
+		if (select("Yes:^777777No (Back)^000000") == 2) {
+			continue;
+		}
+
+		mes .NpcName$;
+		if (Zeny < .PlagiarismFee) {
+			mes "I'm sorry, you don't have enough Zeny.";
+			next;
+			continue;
+		} else if (getskilllv(.skillID)) {
+			mes "Sorry, you already have ^0000FF" + .sName$ + "^000000 learned.";
+			next;
+			continue;
+		} else {
+			Zeny -= .PlagiarismFee;
+			sc_end SC_PRESERVE;
+			plagiarizeskill .skillID, getskilllv(225);
+			specialeffect2 EF_STEAL;
+			mes "The skill ^0000FF" + .sName$ + "^000000 has been copied successfully.";
+			close;
+		}
+	}
+	return;
+
+L_RemoveSkill:
+	mes .NpcName$;
+	mes "Are you sure want to remove plagiarized skill?";
+	next;
+	if (select("Yes:^777777No^000000") == 1) {
+		plagiarizeskillreset 1;
+		mes .NpcName$;
+		mes "Done!";
+	} else {
+		mes .NpcName$;
+		mes "No? Very well. Don't waste my time.";
+	}
+	close;
+
+OnInit:
+	.PlagiarismFee = 100000;
+
+	.NpcName$ = "[Master Rogue]";
+	.FeeMsg$ = "Plagiarize Skill Fee: ^FF3355" + callfunc("F_InsertComma", .PlagiarismFee) + "^000000 ^777777z^000000";
+	.SelectMsg$ = "Please select the skill you want to copy:";
+	end;
+}

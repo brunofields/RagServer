@@ -1,0 +1,472 @@
+//===== rAthena Script ===========================================
+//= Healer NPC
+//===== By: ==================================================
+//= wrywndp (https://www.youtube.com/@wrywndp)
+//===== Description: =============================================
+//= Advanced healer NPC script for (Pre-Renewal).
+//= Healing and buff fees increase progressively for every 10 Base Levels.
+//= GM will use this healer free of charge.
+//===== Additional Comments: =================================
+//= This script is made for Ragnarok Offline Pre-Renewal Pack
+//= https://www.youtube.com/watch?v=aN5OCJdj2qA
+//================================================================
+
+-	script	Healer	-1,{
+
+	disable_items;
+
+	//=====  SETTINGS  =====//
+
+	.Delay			= 0;	// NPC delay (in seconds)
+	.ItemBuffDelay	= 30;	// Delay (in seconds) for any buff with items required (Holy Water, Glistening Coat, Berserk Potion)
+
+	.HealerFee		= 1;	// NPC usage fee (0 = Disable, 1 = Enable)
+	.Time			= 10;	// Buff duration (in minutes)
+
+	.Repair			= 1;	// Automatic equipment repair (0 = Disable, 1 = Enable)
+	.Identify		= 1;	// Automatic identify (0 = Disable, 1 = Enable)
+	.RemoveDebuff	= 1;	// Remove negative status (0 = Disable, 1 = Enable)
+
+	.HealHP			= 100;	// HP heal percentage per pulse (0–100)
+	.HealSP			= 100;	// SP heal percentage per pulse (0–100)
+	.HealCount		= 3;	// Number of heal pulses
+	.HealInterval	= 5;	// Delay between each heal pulse (in seconds)
+
+	.FoodBuff		= 0;	// Food buff (All stats) (0 = Disable, 1 = Enable)
+	.FoodBuffLevel	= 10;	// Food buff level
+
+
+	.Time	*= 60000;		// Convert millisecond to minute [DO NOT TOUCH]
+
+
+
+	HealerMenu:
+		//=====  BUFF DATABASE  =====//
+		.@Buffs = extrabuff;	// Check the database if the player has buff setting activated
+
+		// Check database for buffs using bit fields
+		// e.g. 1,2,4,8,16,32,64,128,256,512,1024,2048,etc...
+		if (.@Buffs) {
+			.@Acolyte		= extrabuff & 1;	// Acolyte basic
+			.@Priest		= extrabuff & 2;	// Priest basic
+			.@PrAspersio	= extrabuff & 4;	// Priest Aspersio
+			.@PrSacramenti	= extrabuff & 8;	// Priest B.S Sacramenti
+			.@HighPriest	= extrabuff & 16;	// High Priest Assumptio
+			.@Blacksmith	= extrabuff & 32;	// Blacksmith basic
+			.@BSOverThrust	= extrabuff & 64;	// Blacksmith Over Thrust
+			.@AlProtection	= extrabuff & 128;	// Alchemist Chemical Protection
+			.@AlBerserk		= extrabuff & 256;	// Alchemist Berserk Pitcher
+			.@Crusader		= extrabuff & 512;	// Crusader Providence
+			.@Sniper		= extrabuff & 1024;	// Sniper Wind Walk
+			.@SoulLinker	= extrabuff & 2048;	// Soul Linker Spirit
+			.@SoulLinkerKa	= extrabuff & 4096;	// Soul Linker Ka
+			.@Assassin		= extrabuff & 8192;	// Assassin Enchant Poison
+		}
+
+		//=====  FEE CALCULATION  =====//
+		// Check if a fee is required; if enabled, calculate the costs.
+		// If fees are disabled or the player is a GM, the service is free.
+		if (.HealerFee && !getgmlevel()) {
+			// Base healing fee
+			.@HealFee = 500 * ((BaseLevel / 10) + 1);
+
+			// Buff fee (calculated separately for future cost adjustments)
+			.@BuffFee = (.@Buffs) ? 500 * ((BaseLevel / 10) + 1) : 0;
+
+			// Total fee calculation
+			.@TotalFee = .@HealFee + .@BuffFee;
+		} else {
+			// Explicitly set to 0 to ensure free usage
+			.@TotalFee = 0;
+		}
+
+		//=====  DELAY  =====//
+		if (@HD > gettimetick(2)) {
+			.@TimeLeft = @HD - gettimetick(2);
+			message strcharinfo(0), "Please wait " + callfunc("F_InsertPlural", .@TimeLeft, "second") + " to use Healer again.";
+			end;
+		}
+
+		//=====  MAIN SCRIPT  =====//
+		.@MainMenu$ = "^1A66FFHeal" + ((extrabuff) ? " + Buffs" : "") + "^000000" + ((.@TotalFee) ? " ^777777[" + callfunc("F_InsertComma", .@TotalFee) + " z]^000000" : "");
+		.@MainMenu$ += ":Settings";
+		.@MainMenu$ += ":^777777Cancel^000000";
+
+		switch(select(.@MainMenu$)) {
+			case 1:
+				if (Zeny < .@TotalFee) {
+					message strcharinfo(0), "Healing" + ((.@Buffs) ? " and Buffs" : "") + " costs " + callfunc("F_InsertComma", .@TotalFee) + " Zeny.";
+					end;
+				}
+
+				Zeny -= .@TotalFee;
+
+				// Automatic equipment repair
+				if (.Repair) {
+					repairall;
+				}
+
+				// Auto-Identify
+				.@IdentifyTemp = identifyall(false);
+				if (.Identify && .@IdentifyTemp) {
+					message strcharinfo(0), callfunc("F_InsertPlural", .@IdentifyTemp, "item") + " identified.";
+					identifyall;
+				}
+
+				// Cleanse negative status
+				if (.RemoveDebuff) {
+					setarray .@debuff_list,
+						SC_BERSERK,
+						SC_BLEEDING,
+						SC_BLIND,
+						SC_CHANGEUNDEAD,
+						SC_CONFUSION,
+						SC_CRITICALWOUND,
+						SC_CURSE,
+						SC_DECREASEAGI,
+						SC_FREEZE,
+						SC_HALLUCINATION,
+						SC_HELLPOWER,
+						SC_LEXAETERNA,
+						SC_ORCISH,
+						SC_POISON,
+						SC_SILENCE,
+						SC_SLEEP,
+						SC_SLOWCAST,
+						SC_SLOWDOWN,
+						SC_STONE,
+						SC_STRIPARMOR,
+						SC_STRIPHELM,
+						SC_STRIPSHIELD,
+						SC_STRIPWEAPON;
+
+					for (.@i = 0; .@i < getarraysize(.@debuff_list); .@i++) {
+						sc_end .@debuff_list[.@i];
+					}
+				}
+
+				// Buff
+				if (.@Buffs) {
+					// Acolyte
+					if (.@Acolyte) {
+						specialeffect2 EF_INCAGIDEX;
+						sc_start SC_BLESSING, .Time, 10;
+						sc_start SC_INCREASEAGI, .Time, 10;
+						sc_start SC_ANGELUS, .Time, 10;
+					}
+
+					// Priest
+					if (.@Priest) {
+						specialeffect2 EF_MAGNIFICAT;
+						sc_start SC_MAGNIFICAT, .Time, 5;
+						sc_start SC_GLORIA, .Time, 5;
+						sc_start SC_IMPOSITIO, .Time, 5;
+						sc_start SC_SUFFRAGIUM, .Time, 3;
+
+						// High Priest buff (Assumptio) are only applied when the Priest buff is also enabled.
+						// Assumptio will override Kyrie Eleison.
+						if (!.@HighPriest) {
+							specialeffect2 EF_KYRIE;
+							sc_start SC_KYRIE, .Time, 10;
+						}
+					}
+
+					// Aspersio
+					if (.@PrAspersio) {
+						.HolyWaterID = 523;	// Holy Water Item ID
+						
+						// You must have 1 Holy Water in your inventory to activate Aspersio buff.
+						if (countitem(.HolyWaterID) > 0 || getgmlevel()) {
+							// GM will not affecting by delayed
+							if (@AspersioDelay > gettimetick(2) && !getgmlevel()) {
+								.@AspersioDelayLeft = @AspersioDelay - gettimetick(2);
+								message strcharinfo(0), "Aspersio was recently applied. Try again in " + callfunc("F_InsertPlural", .@AspersioDelayLeft, "second") + ".";
+							} else {
+								sc_start SC_ASPERSIO, .Time, 5;
+
+								// GM will not using Berserk Potions to use this buff
+								if (!getgmlevel()) {
+									delitem .HolyWaterID, 1;
+									@AspersioDelay = gettimetick(2) + .ItemBuffDelay;
+								}
+							}
+						} else {
+							message strcharinfo(0), "I don't have " + getitemname(.HolyWaterID) + " in my inventory.";
+						}
+					}
+
+					// B.S Sacramenti
+					if (.@PrSacramenti) {
+						sc_start SC_BENEDICTIO, .Time, 5;
+					}
+
+					// High Priest
+					if (.@HighPriest) {
+						specialeffect2 EF_ASSUMPTIO2;
+						sc_start SC_ASSUMPTIO, .Time, 5;
+					}
+
+					// Blacksmith
+					if (.@Blacksmith) {
+						sc_start SC_ADRENALINE, .Time, 5;
+						sc_start SC_ADRENALINE2, .Time, 5;
+						sc_start SC_WEAPONPERFECTION, .Time, 5;
+					}
+
+					// Blacksmith Over Thrust buff is disabled by default because it has a chance to break the player's weapon.
+					if (.@BSOverThrust) {
+						sc_start SC_OVERTHRUST, .Time, 5;
+					}
+
+					// Alchemist
+					if (.@AlProtection) {
+						.GlisteningCoatID = 7139;	// Glistening Coat Item ID
+						
+						// You must have 1 Glistening Coat in your inventory to activate Checmial Protection buff.
+						if (countitem(.GlisteningCoatID) > 0 || getgmlevel()) {
+							// GM will not affecting by delayed
+							if (@ProtectionDelay > gettimetick(2) && !getgmlevel()) {
+								.@ProtectionDelayLeft = @ProtectionDelay - gettimetick(2);
+								message strcharinfo(0), "Chemical Protection was recently applied. Try again in " + callfunc("F_InsertPlural", .@ProtectionDelayLeft, "second") + ".";
+							} else {
+								sc_start SC_CP_HELM, .Time, 5;
+								sc_start SC_CP_ARMOR, .Time, 5;
+								sc_start SC_CP_WEAPON, .Time, 5;
+								sc_start SC_CP_SHIELD, .Time, 5;
+
+								// GM will not using Berserk Potions to use this buff
+								if (!getgmlevel()) {
+									delitem .GlisteningCoatID, 1;
+									@ProtectionDelay = gettimetick(2) + .ItemBuffDelay;
+								}
+							}
+						} else {
+							message strcharinfo(0), "I don't have " + getitemname(.GlisteningCoatID) + " in my inventory.";
+						}
+					}
+
+					if (.@AlBerserk) {
+						.BerserkID = 657;	// Berserk Potion Item ID
+
+						// You must have 2 Berserk Potion in your inventory to activate Berserk Pitcher buff.
+						if (countitem(.BerserkID) > 1 || getgmlevel()) {
+							// GM will not affecting by delayed
+							if (@BerserkDelay > gettimetick(2) && !getgmlevel()) {
+								.@BerserkDelayLeft = @BerserkDelay - gettimetick(2);
+								message strcharinfo(0), "Berserk Pitcher was recently applied. Try again in " + callfunc("F_InsertPlural", .@BerserkDelayLeft, "second") + ".";
+							} else {
+								sc_start SC_ASPDPOTION2, .Time, 0;
+
+								// GM will not using Berserk Potions to use this buff
+								if (!getgmlevel()) {
+									delitem .BerserkID, 2;
+									@BerserkDelay = gettimetick(2) + .ItemBuffDelay;
+								}
+							}
+						} else {
+							message strcharinfo(0), "I don't have " + getitemname(.BerserkID) + " in my inventory.";
+						}
+					}
+
+					// Crusader
+					if (.@Crusader) {
+						sc_start SC_PROVIDENCE, .Time, 5;
+					}
+
+					// Sniper
+					if (.@Sniper) {
+						sc_start SC_WINDWALK, .Time, 10;
+					}
+
+					// Soul Linker
+					if (.@SoulLinker) {
+						switch (BaseJob) {
+							case Job_Knight:			.Spirit = 452; break;
+							case Job_Wizard:			.Spirit = 453; break;
+							case Job_Priest:			.Spirit = 454; break;
+							case Job_Assassin:			.Spirit = 457; break;
+							case Job_Hunter:			.Spirit = 460; break;
+							case Job_Blacksmith:		.Spirit = 458; break;
+							case Job_Crusader:			.Spirit = 450; break;
+							case Job_Sage:				.Spirit = 449; break;
+							case Job_Monk:				.Spirit = 447; break;
+							case Job_Rogue:				.Spirit = 456; break;
+							case Job_Bard:
+							case Job_Dancer:			.Spirit = 455; break;
+							case Job_Alchemist:			.Spirit = 445; break;
+							case Job_Soul_Linker:		.Spirit = 461; break;
+							case Job_Star_Gladiator:	.Spirit = 448; break;
+							case Job_SuperNovice:		.Spirit = 451; break;
+							default:
+								if (Upper == 1 && BaseLevel < 70) {
+									.Spirit = 494;
+								}
+						}
+
+						if (.Spirit) {
+							specialeffect2 EF_SOULLINK;
+							sc_start2 SC_SPIRIT, .Time, 5, .Spirit;
+						}
+					}
+
+					// Soul Linker Ka
+					if (.@SoulLinkerKa) {
+						sc_start SC_KAIZEL, .Time, 7;
+						sc_start SC_KAAHI, .Time, 7;
+						sc_start SC_KAUPE, .Time, 3;
+
+						// Skip Kaite if High Priest buff is active (conflicts with Assumptio)
+						if (!.@HighPriest) {
+							sc_start SC_KAITE, .Time, 7;
+						}
+					}
+
+					// Assassin
+					// Enchant Poison buff will not be activated if Aspersio also activated
+					if (.@Assassin && !.@PrAspersio) {
+						sc_start SC_ENCPOISON, .Time, 10;
+					}
+
+					// Food buff (All Stats)
+					if (.FoodBuff) {
+						sc_start SC_STRFOOD, .Time, .FoodBuffLevel;
+						sc_start SC_AGIFOOD, .Time, .FoodBuffLevel;
+						sc_start SC_VITFOOD, .Time, .FoodBuffLevel;
+						sc_start SC_INTFOOD, .Time, .FoodBuffLevel;
+						sc_start SC_DEXFOOD, .Time, .FoodBuffLevel;
+						sc_start SC_LUKFOOD, .Time, .FoodBuffLevel;
+					}
+				}
+
+				for (.@i = 0; .@i < .HealCount; .@i++) {
+					addtimer .@i * (.HealInterval * 1000), strnpcinfo(3) + "::OnStart";
+				}
+
+				OnStart:
+					specialeffect2 EF_HEAL2;
+					percentheal .HealHP, .HealSP;
+
+				// Start delay count
+				if (.Delay) {
+					@HD = gettimetick(2) + .Delay;
+				}
+
+				end;
+			case 2:
+				.@ONText$		= "^1A66FFON^000000";
+				.@OFFText$		= "^FF3355OFF^000000";
+				.@EnableText$	= "^1A66FFEnable^000000";
+				.@DisableText$	= "^FF3355Disable^000000";
+
+				ClassBuffMenu:
+					setarray .@ClassNames$[0],
+						" - Acolyte",
+						" - Priest",
+						" - Priest (^00A000Aspersio^000000)",
+						" - Priest (^00A000B.S Sacramenti^000000)",
+						" - High Priest (^00A000Assumptio^000000)",
+						" - Blacksmith",
+						" - Blacksmith (^00A000Over Thrust^000000)",
+						" - Alchemist (^00A000Chemical Protection^000000)",
+						" - Alchemist (^00A000Berserk Potion^000000)",
+						" - Crusader (^00A000Providence^000000)",
+						" - Sniper (^00A000Wind Walk^000000)",
+						" - Soul Linker (^00A000Spirit^000000)",
+						" - Soul Linker (^00A000Ka^000000)",
+						" - Assassin (^00A000Enchant Poison^000000)",
+
+					.@menu$ = "";
+
+					for (.@i = 0; .@i < getarraysize(.@ClassNames$); .@i++) {
+						.@bit = (1 << .@i);
+						.@isEnabled = (extrabuff & .@bit);
+						.@menu$ += .@ClassNames$[.@i] + " [" + (.@isEnabled ? .@ONText$ : .@OFFText$) + "]:";
+					}
+
+					.@menu$ += "^1A66FFEnable All Buffs^000000";
+					.@menu$ += ":^FF3355Disable All Buffs^000000";
+					.@menu$ += ":^777777Back to Main Menu^000000";
+
+					.@choice = select(.@menu$);
+
+					if (.@choice >= 1 && .@choice <= getarraysize(.@ClassNames$)) {
+						.@index = .@choice - 1;
+						.@bit = (1 << .@index);
+						.@isEnabled = (extrabuff & .@bit);
+
+						if (select((.@isEnabled ? .@DisableText$ : .@EnableText$) + ":^777777Cancel^000000") == 2) {
+							goto ClassBuffMenu;
+						}
+
+						if (.@isEnabled) {
+							extrabuff &= ~.@bit;
+						} else {
+							extrabuff |= .@bit;
+						}
+
+						goto ClassBuffMenu;
+					}
+
+				// Enable all
+				if (.@choice == getarraysize(.@ClassNames$) + 1) {
+					extrabuff = ((1 << getarraysize(.@ClassNames$)) - 1);
+					goto ClassBuffMenu;
+				}
+
+				// Disable all
+				if (.@choice == getarraysize(.@ClassNames$) + 2) {
+					extrabuff = 0;
+					goto ClassBuffMenu;
+				}
+
+				// Back to Main Menu
+				if (.@choice == getarraysize(.@ClassNames$) + 3) {
+					goto HealerMenu;
+				}
+
+				end;
+			case 3:
+				end;
+		}
+
+	end;
+}
+
+
+
+//============================================================
+// Duplicates
+//============================================================
+aegis,86,80,4	duplicate(Healer)	Healer#aegis	10383
+
+// All original main city Healers are disabled because Aegies City now provides the main Healer NPC.
+// This keeps original main cities clean and uncluttered.
+// To enable any of them again, just remove the // at the start of the line.
+
+// alberta,182,140,4	duplicate(Healer)	Healer#alb	10383
+// aldebaran,138,121,4	duplicate(Healer)	Healer#alde	10383
+// amatsu,200,138,4	duplicate(Healer)	Healer#ama	10383
+// ayothaya,211,201,4	duplicate(Healer)	Healer#ayo	10383
+// brasilis,199,185,4	duplicate(Healer)	Healer#bra	10383
+// comodo,207,138,4	duplicate(Healer)	Healer#com	10383
+// einbech,170,135,4	duplicate(Healer)	Healer#einbe	10383
+// einbroch,175,316,4	duplicate(Healer)	Healer#einbr	10383
+// geffen,122,102,4	duplicate(Healer)	Healer#gef	10383
+// gonryun,163,177,4	duplicate(Healer)	Healer#gon	10383
+// hugel,98,155,4	duplicate(Healer)	Healer#hug	10383
+// izlude,131,114,4	duplicate(Healer)	Healer#izl	10383
+// jawaii,219,163,4	duplicate(Healer)	Healer#jaw	10383
+// lighthalzen,162,94,4	duplicate(Healer)	Healer#lhz	10383
+// louyang,221,98,4	duplicate(Healer)	Healer#lou	10383
+// manuk,278,144,4	duplicate(Healer)	Healer#man	10383
+// mid_camp,216,229,4	duplicate(Healer)	Healer#mid	10383
+// morocc,166,97,4	duplicate(Healer)	Healer#mor	10383
+// moscovia,239,198,4	duplicate(Healer)	Healer#mos	10383
+// payon,168,96,4	duplicate(Healer)	Healer#pay	10383
+// prontera,161,194,4	duplicate(Healer)	Healer#prt	10383
+// rachel,131,143,4	duplicate(Healer)	Healer#rac	10383
+// splendide,206,153,4	duplicate(Healer)	Healer#spl	10383
+// umbala,92,155,4	duplicate(Healer)	Healer#umb	10383
+// veins,220,132,4	duplicate(Healer)	Healer#ve	10383
+// xmas,151,121,4	duplicate(Healer)	Healer#xmas	10383
+// yuno,160,180,4	duplicate(Healer)	Healer#yuno	10383

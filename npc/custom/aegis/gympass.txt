@@ -1,0 +1,137 @@
+//===== rAthena Script =======================================
+//= Advanced Gym Pass NPC
+//===== By: ==================================================
+//= wrywndp (https://www.youtube.com/@wrywndp)
+//===== Description: =========================================
+//= Exchange Gym Passes to learn "Enlarge Weight Limit"
+//===== Additional Comments: =================================
+//= This script is made for Ragnarok Offline Pre-Renewal Pack
+//= https://www.youtube.com/watch?v=aN5OCJdj2qA
+//============================================================
+
+aegis,63,80,6	script	Gym Guy	899,{
+
+	mes .npc_name$;
+	mes "Bring me ^1A66FF" + .name$ + "^000000 to increase it by 200 per level.";
+	mes "You can upgrade up to ^ff0000" + .max + "^000000 times.";
+	next;
+
+	.@menu$ = "^1A66FFUpgrade Carry Weight^000000:Restore Buff:Learn Greed Skill:^777777Exit^000000";
+
+	switch(select(.@menu$)) {
+		case 1:
+			if (gympassmemory >= .max) {
+				mes .npc_name$;
+				mes "You have reached the maximum limit.";
+				close;
+			}
+
+			if (!countitem(.item)) {
+				mes .npc_name$;
+				mes "It appears you're missing a ^1A66FF" + .name$ + "^000000.";
+				close;
+			}
+
+			mes .npc_name$;
+			mes "How many times do you want to increase your carrying capacity?";
+			next;
+
+			switch(select("Just Once:As many as possible")) {
+				case 1:
+					delitem .item, 1;
+					gympassmemory += 1;
+					break;
+				case 2:
+					.@left = .max - gympassmemory;
+					.@have = countitem(.item);
+					.@use = (.@left > .@have) ? .@have : .@left;
+					delitem .item, .@use;
+					gympassmemory += .@use;
+					break;
+				case 3:
+					close;
+			}
+
+			skill 681, gympassmemory, 3;
+			specialeffect2 EF_FOOD01;
+
+			mes .npc_name$;
+			if (gympassmemory < .max) {
+				mes "Done! You can still increase it ^FF0000" + (.max - gympassmemory) + "^000000 more time(s).";
+			} else {
+				mes "Congratulations, you have reached the maximum limit.";
+			}
+			close;
+
+		case 2:
+			if (gympassmemory > 0) {
+				skill 681, gympassmemory, 3;
+				specialeffect2 EF_FOOD01;
+				mes .npc_name$;
+				mes "Done, you should be able to carry more stuff again.";
+			} else {
+				mes .npc_name$;
+				mes "You don't have any strength to restore.";
+			}
+			close;
+		
+		case 3:
+			set @eac, eaclass();
+
+			mes .npc_name$;
+
+			if (!(@eac&EAJL_2) && !(@eac&EAJ_SUPER_NOVICE) && BaseClass != Job_Gunslinger && BaseClass != Job_Ninja && BaseClass != Job_Taekwon) {
+				mes "You are still inexperienced in the ways of the world.";
+				mes "Return to me once you have mastered your second profession.";
+				close;
+			}
+
+			if (BaseJob == Job_Blacksmith) {
+				mes "You are a member of the Smith guild, aren't you?";
+				mes "Your kin are born with the instinct for scavenging. I have nothing to teach a professional like you!";
+				close;
+			}
+
+			if (getskilllv(1013) > 0) {
+				mes "Your hands are already seasoned in the art of gathering.";
+				mes "I have nothing more to teach you.";
+				close;
+			}
+
+			mes "I can teach you to pull items from the ground, but it will cost you ^FF3355" + callfunc("F_InsertComma", .greedcost) + "^000000 z.";
+			next;
+
+			if (select("Learn Greed:^777777No thanks^000000") == 2) {
+				mes .npc_name$;
+				mes "Suit yourself. More loot for me.";
+				close;
+			}
+
+			if (Zeny < .greedcost) {
+				mes .npc_name$;
+				mes "You don't have enough Zeny.";
+				mes "Come back when you're serious about your training.";
+				close;
+			}
+			
+			Zeny -= .greedcost;
+			skill 1013, 1, 3;
+			specialeffect2 EF_FOOD01;
+			
+			mes .npc_name$;
+			mes "There. Your hands now move with the grace of a seasoned scavenger. May the earth yield its treasures to you.";
+			close;
+
+		case 4:
+			mes .npc_name$;
+			mes "Great! You've wasted my time.";
+			close;
+	}
+
+OnInit:
+	.npc_name$ = "[Gym Guy]";
+	.max = 10;
+	.item = 7776;
+	.name$ = getitemname(.item);
+	.greedcost = 100000;
+}
