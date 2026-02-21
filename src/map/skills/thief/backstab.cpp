@@ -21,45 +21,20 @@ void SkillBackStab::calculateSkillRatio(const Damage *wd, const block_list *src,
 }
 
 void SkillBackStab::castendDamageId(block_list *src, block_list *target, uint16 skill_lv, t_tick tick, int32& flag) const {
-	map_session_data* sd = BL_CAST( BL_PC, src );
+	map_session_data* sd = BL_CAST(BL_PC, src);
 
-#ifdef RENEWAL
-	uint8 dir = map_calc_dir(src, target->x, target->y);
-	int16 x, y;
-
-	if (dir > 0 && dir < 4)
-		x = -1;
-	else if (dir > 4)
-		x = 1;
-	else
-		x = 0;
-
-	if (dir > 2 && dir < 6)
-		y = -1;
-	else if (dir == 7 || dir < 2)
-		y = 1;
-	else
-		y = 0;
-
-	if (battle_check_target(src, target, BCT_ENEMY) > 0 && unit_movepos(src, target->x + x, target->y + y, 2, true)) { // Display movement + animation.
-#else
-	if (check_distance_bl(src, target, 0))
+	// Apenas verifica se é inimigo válido
+	if (battle_check_target(src, target, BCT_ENEMY) <= 0) {
+		if (sd)
+			clif_skill_fail(*sd, getSkillId());
 		return;
-
-	uint8 dir = map_calc_dir(src, target->x, target->y), t_dir = unit_getdir(target);
-
-	if (!map_check_dir(dir, t_dir) || target->type == BL_SKILL) {
-#endif
-		status_change_end(src, SC_HIDING);
-		dir = dir < 4 ? dir+4 : dir-4; // change direction [Celest]
-		unit_setdir(target,dir);
-#ifdef RENEWAL
-		clif_blown(src);
-#endif
-		skill_attack(BF_WEAPON, src, src, target, getSkillId(), skill_lv, tick, flag);
 	}
-	else if (sd)
-		clif_skill_fail( *sd, getSkillId() );
+
+	// Remove hiding normalmente
+	status_change_end(src, SC_HIDING);
+
+	// Aplica dano independentemente da direção
+	skill_attack(BF_WEAPON, src, src, target, getSkillId(), skill_lv, tick, flag);
 }
 
 void SkillBackStab::applyAdditionalEffects(block_list *src, block_list *target, uint16 skill_lv, t_tick tick, int32 attack_type, enum damage_lv dmg_lv) const {

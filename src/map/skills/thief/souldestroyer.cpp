@@ -15,7 +15,7 @@ void SkillSoulDestroyer::calculateSkillRatio(const Damage *wd, const block_list 
 #ifdef RENEWAL
 	const status_data* sstatus = status_get_status_data(*src);
 
-	skillratio += -100 + 150 * skill_lv + sstatus->str + sstatus->int_; // !TODO: Confirm stat modifier
+	skillratio += -100 + 200 * skill_lv + sstatus->str + sstatus->agi; // !TODO: Confirm stat modifier
 	RE_LVL_DMOD(100);
 #else
 	// Pre-Renewal: skill ratio for weapon part of damage [helvetica]

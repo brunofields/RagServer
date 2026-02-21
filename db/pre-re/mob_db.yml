@@ -3519,6 +3519,7 @@ Body:
         Rate: 800
       - Item: Mace_
         Rate: 80
+        RandomOptionGroup: RTC_ATK_BOX
       - Item: Jellopy
         Rate: 3000
       - Item: Red_Herb

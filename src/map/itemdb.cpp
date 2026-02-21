@@ -3347,7 +3347,7 @@ char itemdb_isidentified(t_itemid nameid) {
 		case IT_ARMOR:
 		case IT_PETARMOR:
 		case IT_SHADOWGEAR:
-			return 0;
+			return 1; // sempre identificado
 		default:
 			return 1;
 	}

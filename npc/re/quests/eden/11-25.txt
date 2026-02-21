@@ -158,6 +158,9 @@ L_Quest:
 		mes "Please help us again. Thanks!";
 		if (.@item_req)
 			delitem .@item_req,.@req_amount;
+
+		// entrega itens
+		getitem 1001258, 1;
 		erasequest .@quest_id;
 		setquest .@quest_id+10;
 		getexp getarg(2),0;
