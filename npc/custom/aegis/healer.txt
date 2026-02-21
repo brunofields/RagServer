@@ -158,10 +158,10 @@
 					// Priest
 					if (.@Priest) {
 						specialeffect2 EF_MAGNIFICAT;
-						sc_start SC_MAGNIFICAT, .Time, 5;
-						sc_start SC_GLORIA, .Time, 5;
-						sc_start SC_IMPOSITIO, .Time, 5;
-						sc_start SC_SUFFRAGIUM, .Time, 3;
+						sc_start SC_MAGNIFICAT, .Time, 10;
+						sc_start SC_GLORIA, .Time, 10;
+						sc_start SC_IMPOSITIO, .Time, 10;
+						sc_start SC_SUFFRAGIUM, .Time, 10;
 
 						// High Priest buff (Assumptio) are only applied when the Priest buff is also enabled.
 						// Assumptio will override Kyrie Eleison.
@@ -443,6 +443,7 @@ aegis,86,80,4	duplicate(Healer)	Healer#aegis	10383
 // This keeps original main cities clean and uncluttered.
 // To enable any of them again, just remove the // at the start of the line.
 
+ moc_para01,41,22,4	duplicate(Healer)	Healer#aegisz	10383		
  alberta,182,140,4	duplicate(Healer)	Healer#alb	10383
  aldebaran,138,121,4	duplicate(Healer)	Healer#alde	10383
  amatsu,200,138,4	duplicate(Healer)	Healer#ama	10383

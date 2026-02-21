@@ -2798,7 +2798,7 @@ Body:
       Skill:
         Plagiarism: true
         Reproduce: true
-    CastTime: 4000
+    CastTime: 2000
     AfterCastActDelay: 1000
     Duration1:
       - Level: 1
@@ -2845,9 +2845,6 @@ Body:
           Amount: 56
         - Level: 10
           Amount: 58
-      ItemCost:
-        - Item: Blue_Gemstone
-          Amount: 1
     Unit:
       Id: Magnus
       Layout: -1

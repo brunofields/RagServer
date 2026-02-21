@@ -8354,15 +8354,21 @@ static int8 skill_castend_id_check(block_list *src, block_list *target, uint16 s
 			if (tsc && tsc->option&OPTION_MADOGEAR)
 				return USESKILL_FAIL_TOTARGET;
 			break;
-		case RG_BACKSTAP:
+// 		case RG_BACKSTAP:
+// 			{
+// #ifndef RENEWAL
+// 				uint8 dir = map_calc_dir(src,target->x,target->y), t_dir = unit_getdir(target);
+
+// 				if (map_check_dir(dir, t_dir))
+// 					return USESKILL_FAIL_MAX;
+// #endif
+
+// 				if (check_distance_bl(src, target, 0))
+// 					return USESKILL_FAIL_MAX;
+// 			}
+// 			break;
+			case RG_BACKSTAP:
 			{
-#ifndef RENEWAL
-				uint8 dir = map_calc_dir(src,target->x,target->y), t_dir = unit_getdir(target);
-
-				if (map_check_dir(dir, t_dir))
-					return USESKILL_FAIL_MAX;
-#endif
-
 				if (check_distance_bl(src, target, 0))
 					return USESKILL_FAIL_MAX;
 			}
@@ -10993,10 +10999,10 @@ int32 skill_unit_onplace_timer(skill_unit *unit, block_list *bl, t_tick tick)
 			break;
 
 		case UNT_MAGNUS:
-#ifndef RENEWAL
-			if (!battle_check_undead(tstatus->race,tstatus->def_ele) && tstatus->race!=RC_DEMON)
-				break;
-#endif
+// #ifndef RENEWAL
+// 			if (!battle_check_undead(tstatus->race,tstatus->def_ele) && tstatus->race!=RC_DEMON)
+// 				break;
+// #endif
 			skill_attack(BF_MAGIC,ss,unit,bl,sg->skill_id,sg->skill_lv,tick,0);
 			break;
 
