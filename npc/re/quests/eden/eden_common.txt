@@ -262,7 +262,7 @@ lighthalzen,164,86,4	duplicate(eto)	Eden Teleport Officer#21	729
 amatsu,100,145,5	duplicate(eto)	Eden Teleport Officer#22	729
 ayothaya,221,191,3	duplicate(eto)	Eden Teleport Officer#23	729
 louyang,224,107,3	duplicate(eto)	Eden Teleport Officer#24	729
-gonryun,162,122,5	duplicate(eto)	Eden Teleport Officer#25	729
+gonryun,156,122,5	duplicate(eto)	Eden Teleport Officer#25	729
 moscovia,209,197,5	duplicate(eto)	Eden Teleport Officer#26	729
 brasilis,191,224,3	duplicate(eto)	Eden Teleport Officer#27	729
 dewata,192,193,5	duplicate(eto)	Eden Teleport Officer#28	729
