@@ -4741,12 +4741,11 @@ Body:
     MaxLevel: 10
     Type: Weapon
     TargetType: Attack
-    Range: 1
+    Range: 7
     Hit: Multi_Hit
     HitCount: -8
     Element: Weapon
-    AfterCastActDelay: 2000
-    AfterCastWalkDelay: 2000
+    Cooldown: 500
     Duration2: 5000
     CastDelayFlags:
       IgnoreStatus: true
@@ -10140,7 +10139,7 @@ Body:
       - Level: 4
         Time: 55000
       - Level: 5
-        Time: 60000
+        Time: 180000
     Duration2: 60000
     Requires:
       SpCost:
@@ -10164,34 +10163,32 @@ Body:
     MaxLevel: 10
     Type: Weapon
     TargetType: Attack
-    DamageFlags:
-      IgnoreAtkCard: true
     Range: 9
     Hit: Single
     HitCount: 1
     Element: Weapon
-    CastTime: 700
+    CastTime: 500
     AfterCastActDelay:
       - Level: 1
-        Time: 1000
+        Time: 750
       - Level: 2
-        Time: 1200
+        Time: 750
       - Level: 3
-        Time: 1400
+        Time: 750
       - Level: 4
-        Time: 1600
+        Time: 750
       - Level: 5
-        Time: 1800
+        Time: 750
       - Level: 6
-        Time: 2000
+        Time: 750
       - Level: 7
-        Time: 2200
+        Time: 750
       - Level: 8
-        Time: 2400
+        Time: 750
       - Level: 9
-        Time: 2600
+        Time: 750
       - Level: 10
-        Time: 2800
+        Time: 750
     Requires:
       SpCost:
         - Level: 1
@@ -11021,9 +11018,9 @@ Body:
     Hit: Single
     HitCount: 1
     Element: Weapon
-    SplashArea: 2
+    SplashArea: 3
     CastTime: 500
-    AfterCastActDelay: 500
+    AfterCastActDelay: 750
     Duration2:
       - Level: 1
         Time: 30000
@@ -11034,25 +11031,25 @@ Body:
     Requires:
       SpCost:
         - Level: 1
-          Amount: 10
+          Amount: 8
         - Level: 2
-          Amount: 12
+          Amount: 8
         - Level: 3
-          Amount: 14
+          Amount: 8
         - Level: 4
-          Amount: 16
+          Amount: 8
         - Level: 5
-          Amount: 18
+          Amount: 8
         - Level: 6
-          Amount: 20
+          Amount: 8
         - Level: 7
-          Amount: 22
+          Amount: 10
         - Level: 8
-          Amount: 24
+          Amount: 12
         - Level: 9
-          Amount: 26
+          Amount: 16
         - Level: 10
-          Amount: 28
+          Amount: 18
   - Id: 407
     Name: ASC_CDP
     Description: Create Deadly Poison

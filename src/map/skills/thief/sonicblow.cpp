@@ -11,6 +11,26 @@
 SkillSonicBlow::SkillSonicBlow() : WeaponSkillImpl(AS_SONICBLOW) {
 }
 
+void SkillSonicBlow::castendDamageId(block_list *src, block_list *target, uint16 skill_lv, t_tick tick, int32& flag) const {
+	map_session_data* sd = BL_CAST(BL_PC, src);
+
+	if (battle_check_target(src, target, BCT_ENEMY) <= 0) {
+		if (sd)
+			clif_skill_fail(*sd, getSkillId());
+		return;
+	}
+
+	// === TELEPORTA PARA O ALVO ===
+	unit_movepos(src, target->x, target->y, 0, true);
+	clif_blown(src);
+
+	// Remove qualquer delay de animação
+	flag |= BF_WEAPON;
+
+	// Aplica dano normalmente
+	skill_attack(BF_WEAPON, src, src, target, getSkillId(), skill_lv, tick, flag);
+}
+
 void SkillSonicBlow::calculateSkillRatio(const Damage *wd, const block_list *src, const block_list *target, uint16 skill_lv, int32 &base_skillratio, int32 mflag) const {
 #ifdef RENEWAL
 	const status_data* tstatus = status_get_status_data(*target);
