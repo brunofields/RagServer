@@ -41073,3 +41073,143 @@ Body:
     ArmorLevel: 1
     EquipLevelMin: 1
     View: 654
+  - Id: 2560
+    AegisName: Para_Team_Manteau
+    Name: Eden Team Manteau I
+    Type: Armor
+    Defense: 3
+    Locations:
+      Garment: true
+    ArmorLevel: 1
+    EquipLevelMin: 7
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus2 bSubEle,Ele_Neutral,10;
+  - Id: 2456
+    AegisName: Para_Team_Boots1
+    Name: Eden Team Boots I
+    Type: Armor
+    Defense: 3
+    Locations:
+      Shoes: true
+    ArmorLevel: 1
+    EquipLevelMin: 7
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus bHPrecovRate,10;
+      bonus bSPrecovRate,2;
+  - Id: 2457
+    AegisName: Para_Team_Boots2
+    Name: Eden Team Boots II
+    Type: Armor
+    Defense: 16
+    Locations:
+      Shoes: true
+    ArmorLevel: 1
+    EquipLevelMin: 26
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus bHPrecovRate,12;
+      bonus bSPrecovRate,4;
+  - Id: 2458
+    AegisName: Para_Team_Boots3
+    Name: Eden Team Boots III
+    Type: Armor
+    Defense: 18
+    Locations:
+      Shoes: true
+    ArmorLevel: 1
+    EquipLevelMin: 40
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus bHPrecovRate,14;
+      bonus bSPrecovRate,6;
+  - Id: 15009
+    AegisName: Para_Team_Uniform1
+    Name: Eden Team Uniform I
+    Type: Armor
+    Defense: 6
+    Locations:
+      Armor: true
+    ArmorLevel: 1
+    EquipLevelMin: 7
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus bMaxHP,100;
+      bonus bMaxSP,10;
+  - Id: 15010
+    AegisName: Para_Team_Uniform2
+    Name: Eden Team Uniform II
+    Type: Armor
+    Defense: 46
+    Locations:
+      Armor: true
+    ArmorLevel: 1
+    EquipLevelMin: 26
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus bMaxHP,200;
+      bonus bMaxSP,20;
+  - Id: 15011
+    AegisName: Para_Team_Uniform3
+    Name: Eden Team Uniform III
+    Type: Armor
+    Defense: 58
+    Locations:
+      Armor: true
+    ArmorLevel: 1
+    EquipLevelMin: 40
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoCart: true
+      NoStorage: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+    Script: |
+      bonus bMaxHP,300;
+      bonus bMaxSP,30;
+      bonus bMdef,5;

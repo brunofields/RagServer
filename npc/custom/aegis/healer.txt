@@ -453,7 +453,7 @@ aegis,86,80,4	duplicate(Healer)	Healer#aegis	10383
  einbech,170,135,4	duplicate(Healer)	Healer#einbe	10383
  einbroch,175,316,4	duplicate(Healer)	Healer#einbr	10383
  geffen,122,102,4	duplicate(Healer)	Healer#gef	10383
- gonryun,163,177,4	duplicate(Healer)	Healer#gon	10383
+ gonryun,155,118,5	duplicate(Healer)	Healer#gon	10383
  hugel,98,155,4	duplicate(Healer)	Healer#hug	10383
  izlude,131,114,4	duplicate(Healer)	Healer#izl	10383
  jawaii,219,163,4	duplicate(Healer)	Healer#jaw	10383
